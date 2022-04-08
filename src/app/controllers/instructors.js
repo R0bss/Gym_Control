@@ -1,4 +1,5 @@
 const {age, date} = require('../../lib/utils')
+const db = require('../../config/db')
 
 module.exports = {
   index(req, res){
@@ -15,28 +16,32 @@ module.exports = {
         return res.send('Please, fill all fields!')      
       }
     }
-    let {avatar_url, birth, name, services, gender} = req.body
-  
-    birth = Date.parse(birth)
-    const created_at = Date.now()
-    const id = Number(data.instructors.length + 1)
-  
-    data.instructors.push({
-      id,
-      name,
-      avatar_url,
-      birth,
-      gender,
-      services,
-      created_at,
+
+    const query = `
+      INSERT INTO INSTRUCTORS (
+        name,
+        avatar_url,
+        gender,
+        services,
+        birth,
+        created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+    `
+    
+    const values = [
+      req.body.name,
+      req.body.avatar_url,
+      req.body.gender,
+      req.body.services,
+      date(req.body.birth).iso,
+      date(Date.now()).iso
+    ]
+
+    db.query(query, values, function(err, results){
+      if(err) return res.send("Database Error!")
+
+      return res.redirect(`/instructors/${results.rows[0].id}`)
     })
-  
-    fs.writeFile("data.json", JSON.stringify(data,  null, 2), function(err){
-      if (err) return res.send("Write file error!") 
-  
-      return res.redirect("/instructors")
-    })
-    // return res.send(req.body)
   },
   show(req, res){  
     //req.params
