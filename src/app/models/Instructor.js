@@ -5,7 +5,7 @@ const db = require('../../config/db')
 module.exports = {
   all(callback) {
     db.query(`SELECT * FROM instructors`, function(err,results){
-      if(err) return res.send("Database Error!")
+      if(err) throw `Database Error! ${err}`
 
       callback(results.rows)
     })
@@ -32,18 +32,19 @@ module.exports = {
       date(Date.now()).iso
     ]
 
-    db.query(query, values, function(err, results){
-      if(err) return res.send("Database Error!")
+    db.query(query, values,function(err,results){
+      if(err) throw `Database Error! ${err}`
 
       callback(results.rows[0])
     })
+
   },
   find(id, callback) {
     db.query(`
       SELECT *
       FROM instructors
       WHERE id = $1`, [id], function(err, results){
-        if(err) return res.send("Database Error!")
+        if(err) throw `Database Error! ${err}`
         callback(results.rows[0])
     })
   },
@@ -67,7 +68,7 @@ module.exports = {
       data.id
     ]
     db.query(query, values, function(err, results){
-      if(err) return res.send("Database Error!")
+      if(err) throw `Database Error! ${err}`
       callback()
     })
   }
