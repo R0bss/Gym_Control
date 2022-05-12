@@ -53,7 +53,7 @@ module.exports = {
     UPDATE instructors SET
       avatar_url=($1),
       name=($2),
-      birth($3),
+      birth=($3),
       gender=($4),
       services=($5)
     WHERE id = $6
@@ -70,6 +70,13 @@ module.exports = {
     db.query(query, values, function(err, results){
       if(err) throw `Database Error! ${err}`
       callback()
+    })
+  },
+  delete(id, callback){
+    db.query(`DELETE FROM instructors WHERE id = $1`, [id], function(err, results){
+      if(err) throw `Database Error! ${err}`
+
+      return callback()
     })
   }
 }
